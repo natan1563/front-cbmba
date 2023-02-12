@@ -1,42 +1,21 @@
 <template>
   <v-app>
-    <v-app-bar
-      app
-      color="error"
-      dark
+    <transition
+      :name="'router'"
+      mode="out-in"
+      appear
     >
-      <div class="d-flex align-center">
-        <b class="title-text">CBMBA</b>        
-      </div>
-
-      <v-spacer></v-spacer>
-
-      <v-tabs v-model="tab" right>
-        <v-tab>Login</v-tab>
-        <v-tab>Cadastro</v-tab>
-      </v-tabs>
-    </v-app-bar>
-
-    <v-main>
-      <Main
-        :current-tab="tab"
-      />
-    </v-main>
+      <router-view></router-view>
+    </transition>
   </v-app>
 </template>
 
 <script>
-import Main from './components/Main';
 
 export default {
   name: 'App',
 
-  components: {
-    Main,
-  },
-
   data: () => ({
-    tab: 0
   }),
 };
 </script>

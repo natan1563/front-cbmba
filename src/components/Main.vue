@@ -1,6 +1,24 @@
 <template>
   <v-container>
-    <v-row class="text-center">
+    <v-app-bar
+      app
+      color="error"
+      dark
+      class="d-block"
+    >
+      <div class="d-flex align-center">
+        <b class="title-text">CBMBA</b>        
+      </div>
+
+      <v-spacer></v-spacer>
+
+      <v-tabs v-model="tab" right>
+        <v-tab>Login</v-tab>
+        <v-tab>Cadastro</v-tab>
+      </v-tabs>
+    </v-app-bar>
+
+    <v-col cols="12" class="text-center mt-10">
       <v-col cols="12">
         <v-img
           :src="require('../assets/images/logo.png')"
@@ -12,20 +30,20 @@
 
       <v-col
         cols="8"
-        class="mx-auto mt-5"
+        class="mx-auto"
       >
-        <section v-if="currentTab === 1">
+        <section v-if="tab === 1">
           <Register/>
         </section>
         <section 
           class="mt-4"
-          v-else-if="currentTab === 0"
+          v-else-if="tab === 0"
         >
           <Login/>
         </section>
       </v-col>
 
-    </v-row>
+    </v-col>
   </v-container>
 </template>
 
@@ -35,67 +53,12 @@ import Login from "./forms/auth/Login";
 
   export default {
     name: 'Main',
-    props: {
-      currentTab: {
-        type: Number,
-        default: 0
-      },
-    },
     components: {
       Register,
       Login,
     },
     data: () => ({
-      ecosystem: [
-        {
-          text: 'vuetify-loader',
-          href: 'https://github.com/vuetifyjs/vuetify-loader',
-        },
-        {
-          text: 'github',
-          href: 'https://github.com/vuetifyjs/vuetify',
-        },
-        {
-          text: 'awesome-vuetify',
-          href: 'https://github.com/vuetifyjs/awesome-vuetify',
-        },
-      ],
-      importantLinks: [
-        {
-          text: 'Documentation',
-          href: 'https://vuetifyjs.com',
-        },
-        {
-          text: 'Chat',
-          href: 'https://community.vuetifyjs.com',
-        },
-        {
-          text: 'Made with Vuetify',
-          href: 'https://madewithvuejs.com/vuetify',
-        },
-        {
-          text: 'Twitter',
-          href: 'https://twitter.com/vuetifyjs',
-        },
-        {
-          text: 'Articles',
-          href: 'https://medium.com/vuetify',
-        },
-      ],
-      whatsNext: [
-        {
-          text: 'Explore components',
-          href: 'https://vuetifyjs.com/components/api-explorer',
-        },
-        {
-          text: 'Select a layout',
-          href: 'https://vuetifyjs.com/getting-started/pre-made-layouts',
-        },
-        {
-          text: 'Frequently Asked Questions',
-          href: 'https://vuetifyjs.com/getting-started/frequently-asked-questions',
-        },
-      ],
+      tab: 0
     }),
   }
 </script>
