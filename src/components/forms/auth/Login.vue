@@ -43,6 +43,7 @@
 <script>
   import { required, email } from 'vee-validate/dist/rules'
   import { extend, ValidationObserver, ValidationProvider, setInteractionMode } from 'vee-validate'
+import axios from 'axios'
   // import axios from 'axios';
 
   setInteractionMode('eager')
@@ -68,8 +69,37 @@
 
     methods: {
       submit () {
-        this.$refs.observer.validate()
+        this.$refs.observer
+        .validate()
+        .then((isValid) =>{
+          if (!isValid) {
+            throw new Error('Por favor verifique os campos requeridos e tente novamente.');
+          }
+
+          const apiUrl = 'http://localhost:8000/api';
+          axios.post(`${apiUrl}/auth`, {
+            email: this.email,
+            password: this.password
+          })
+          .then(response => {
+            if (response.status !== 200)
+              throw new Error('Email ou senha inválidos')
+
+            const { data } = response;
+            localStorage.setItem('accessToken', data?.authorization?.token)
+            this.$store.dispatch('SET_USER_DATA', {
+              user: data.user,
+              token: data?.authorization?.token
+            })
+
+            this.$router.push({name: 'home'});
+          })
+          .catch(error => {
+            // TODO: Implementar mensagem amigavel de erro
+            console.log(error.message)
+          })
+        })
       },
-    },
+    }
   }
 </script>

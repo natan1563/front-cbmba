@@ -4,8 +4,6 @@ import VueRouter from 'vue-router'
 Vue.use(VueRouter)
 
 const routes = [
-  // ? We are redirecting to different pages based on role.
-  // NOTE: Role is just for UI purposes. ACL is based on abilities.
   {
     path: '/',
     redirect: function () {
@@ -21,11 +19,11 @@ const routes = [
     path: '/auth',
     name: 'auth-user',
     component: () => import('@/components/Main.vue'),
-    meta: {
-      layout: 'blank',
-      resource: 'Public',
-      redirectIfLoggedIn: true,
-    },
+  },
+  {
+    path: '/home',
+    name: 'home',
+    component: () => import('@/components/user/Home.vue'),
   },
   {
     path: '*',
