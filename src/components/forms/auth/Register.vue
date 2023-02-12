@@ -224,9 +224,7 @@
       cep(newValue) {
           const cepMask = /([0-9]{4})-?([0-9]{4})/
           if (newValue && cepMask.test(newValue)) {
-            // const defaultRoute = "https://viacep.com.br/ws/{CEP}/json/";
-            const defaultRoute = process.env.VIA_CEP_API
-            console.log(defaultRoute);
+            const defaultRoute = "https://viacep.com.br/ws/{CEP}/json/";
             const endpoint = defaultRoute.replace('{CEP}', newValue);
             axios.get(endpoint.replace('-', ''))
                   .then(response => {
@@ -279,6 +277,7 @@
                 user: data.user,
                 token: data.token
               })
+              this.$router.push({name: 'home'})
             });
         })
       },
