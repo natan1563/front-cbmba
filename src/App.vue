@@ -1,28 +1,49 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-  </div>
+  <v-app>
+    <v-app-bar
+      app
+      color="error"
+      dark
+    >
+      <div class="d-flex align-center">
+        <b class="title-text">CBMBA</b>        
+      </div>
+
+      <v-spacer></v-spacer>
+
+      <v-tabs v-model="tab" right>
+        <v-tab>Login</v-tab>
+        <v-tab>Cadastro</v-tab>
+      </v-tabs>
+    </v-app-bar>
+
+    <v-main>
+      <Main
+        :current-tab="tab"
+      />
+    </v-main>
+  </v-app>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import Main from './components/Main';
 
 export default {
   name: 'App',
+
   components: {
-    HelloWorld
-  }
-}
+    Main,
+  },
+
+  data: () => ({
+    tab: 0
+  }),
+};
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+  .title-text {
+    font-family: 'LilitaOne', 'sans-serif';
+    font-size: 28px;
+  }
 </style>
