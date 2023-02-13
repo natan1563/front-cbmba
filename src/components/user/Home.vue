@@ -12,7 +12,13 @@
         color="error"
         @click="doLogout"
       >
-        Sair
+        <span v-if="!onRequestLoggout">Sair</span>
+        <v-progress-circular
+          v-else
+          indeterminate
+          error
+          :size="15"
+        />
       </v-btn>
   </v-app-bar>
   
@@ -401,7 +407,8 @@ export default {
         value => !value || value.size < 2000000 || 'O tamanho da imagem tem que ser menor que 2 MB!',
       ],
       API_URL: process.env.API_URL,
-      dataIsLoading: true
+      dataIsLoading: true,
+      onRequestLoggout: false,
     }),
 
     watch: {
@@ -560,6 +567,7 @@ export default {
       },
 
       doLogout () {
+        this.onRequestLoggout = true;
         const token = this.getToken();
         axios.delete(`${this.API_URL}/auth`, {
           headers: {
@@ -574,6 +582,7 @@ export default {
           this.setError(error)
         })
         .finally(() => {
+          this.onRequestLoggout = false;
           this.logout();
         });
       },
