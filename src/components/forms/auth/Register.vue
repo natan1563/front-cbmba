@@ -66,7 +66,7 @@
         rules="required|max:9"
       >
         <v-text-field
-          v-model="cep"
+          v-model="zipcode"
           :error-messages="errors"
           :counter="9"
           label="CEP"
@@ -150,7 +150,7 @@
 </template>
 
 <script>
-  import { required, digits, email, min, max, regex, confirmed } from 'vee-validate/dist/rules'
+  import { required, digits, email, min, max, confirmed } from 'vee-validate/dist/rules'
   import { extend, ValidationObserver, ValidationProvider, setInteractionMode } from 'vee-validate'
   import brazilianData from '@/assets/json/br-states-uf.json';
   import axios from 'axios';
@@ -182,11 +182,6 @@
     message: '{_field_} não pode ter menos de {length} caracteres',
   })
 
-  extend('regex', {
-    ...regex,
-    message: '{_field_} {_value_} does not match {regex}',
-  })
-
   extend('email', {
     ...email,
     message: 'Email must be valid',
@@ -202,7 +197,7 @@
       email: '',
       password: '',
       password_confirm: '',
-      cep: '',
+      zipcode: '',
       public_area: '',
       locality: '',
       neighborhood: '',
@@ -210,7 +205,7 @@
       avatar: null,
       brazilianUFs: [],
       fileRules: [
-        value => !value || value.size < 2000000 || 'Avatar size should be less than 2 MB!',
+        value => !value || value.size < 2000000 || 'O tamanho da imagem tem que ser menor que 2 MB!',
       ],
     }),
 
@@ -221,7 +216,7 @@
     },
 
     watch: {
-      cep(newValue) {
+      zipcode(newValue) {
           const cepMask = /([0-9]{4})-?([0-9]{4})/
           if (newValue && cepMask.test(newValue)) {
             const defaultRoute = "https://viacep.com.br/ws/{CEP}/json/";
@@ -272,11 +267,12 @@
                 throw new Error(data.error)
               }
 
-              localStorage.setItem('accessToken', data.token)
-              this.$store.dispatch('SET_USER_DATA', {
-                user: data.user,
-                token: data.token
-              })
+              localStorage.setItem('accessToken', data?.token)
+              localStorage.setItem('userData', data?.user)
+
+              this.$store.dispatch('SET_USER_DATA', data.user)
+              this.$store.dispatch('SET_ACCESS_TOKEN', data.token)
+
               this.$router.push({name: 'home'})
             });
         })
