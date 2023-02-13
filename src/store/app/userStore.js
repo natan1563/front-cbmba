@@ -8,7 +8,7 @@ export default {
       state.userData = payload
     },
     SET_ACCESS_TOKEN(state, payload) {
-      state.userData = payload
+      state.accessToken = payload
     },
   },
   actions: {
