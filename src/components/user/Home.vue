@@ -31,11 +31,24 @@
     <template v-slot:top>
         <v-dialog
           v-model="dialog"
-          max-width="500px"
+          max-width="800px"
+          max-height="600px"
         >
           <v-card>
             <v-card-title>
-              <span class="text-h5">Editar usuário</span>
+              <div class="px-2">
+                <v-avatar
+                  v-if="editedItem.avatar"
+                  size="48"
+                >
+                  <v-img
+                    :lazy-src="`http://localhost:8000/api/avatar/${editedItem.avatar}`"
+                    :src="`http://localhost:8000/api/avatar/${editedItem.avatar}`"
+                  />
+                </v-avatar>
+
+              </div>
+              <span class="text-h5">{{ editedItem.name }}</span>
             </v-card-title>
 
             <v-card-text>
@@ -61,6 +74,18 @@
                       label="E-mail"
                     ></v-text-field>
                   </v-col>
+
+                  <v-col
+                    cols="12"
+                    sm="6"
+                    md="4"
+                  >
+                    <v-text-field
+                      v-model="editedItem.address.zipcode"
+                      label="CEP"
+                    ></v-text-field>
+                  </v-col>
+
                   <v-col
                     cols="12"
                     sm="6"
@@ -71,25 +96,56 @@
                       label="Endereço"
                     ></v-text-field>
                   </v-col>
+
                   <v-col
                     cols="12"
                     sm="6"
                     md="4"
                   >
                     <v-text-field
-                      v-model="editedItem.neighborhood"
+                      v-model="editedItem.address.public_area"
+                      label="Município"
+                    ></v-text-field>
+                  </v-col>
+
+                  <v-col
+                    cols="12"
+                    sm="6"
+                    md="4"
+                  >
+                    <v-text-field
+                      v-model="editedItem.address.neighborhood"
                       label="Bairro"
                     ></v-text-field>
                   </v-col>
+
                   <v-col
                     cols="12"
                     sm="6"
                     md="4"
                   >
                     <v-select
-                      v-model="editedItem.uf"
-                      label="UF"
-                    ></v-select>
+                    v-model="editedItem.address.uf"
+                    :items="brazilianUFs"
+                    label="UF"
+                    data-vv-name="UF"
+                    required
+                  ></v-select>
+                  </v-col>
+                  
+                  <v-col
+                    cols="12"
+                    sm="6"
+                    md="4"
+                  >
+                    <v-file-input
+                      v-model="editedItem.newAvatar"
+                      :rules="fileRules"
+                      accept="image/png, image/jpeg, image/bmp"
+                      placeholder="Escolha um avatar"
+                      prepend-icon="mdi-camera"
+                      label="Avatar"
+                    ></v-file-input>
                   </v-col>
                 </v-row>
               </v-container>
@@ -102,14 +158,14 @@
                 text
                 @click="close"
               >
-                Cancel
+                Cancelar
               </v-btn>
               <v-btn
                 color="blue darken-1"
                 text
                 @click="save"
               >
-                Save
+                Atualizar
               </v-btn>
             </v-card-actions>
           </v-card>
@@ -157,6 +213,7 @@
 <script>
 import axios from 'axios'
 import LoggedMixin from '@/mixins/LoggedMixin';
+import brazilianData from '@/assets/json/br-states-uf.json';
 
 export default {
     mixins: [LoggedMixin],
@@ -207,9 +264,11 @@ export default {
         name: '',
         email: 0,
         address: 0,
+        avatar: '',
         neighborhood: 0,
         uf: 0,
         created_at: 0,
+        newAvatar: ''
       },
       defaultItem: {
         name: '',
@@ -219,6 +278,10 @@ export default {
         uf: 0,
         created_at: 0,
       },
+      brazilianUFs: [],
+      fileRules: [
+        value => !value || value.size < 2000000 || 'O tamanho da imagem tem que ser menor que 2 MB!',
+      ],
     }),
 
     watch: {
@@ -233,6 +296,9 @@ export default {
     async created () {
       await this.isLogged()
       this.initialize()
+       this.brazilianUFs = brazilianData.UF.map(item => {
+        return item.sigla
+      });
     },
 
     filters: {
@@ -243,7 +309,7 @@ export default {
 
     methods: {
       initialize () {
-        const token = localStorage.getItem('accessToken');
+        const token = this.$store.getters.getUserToken || localStorage.getItem('accessToken');
         axios.get('http://localhost:8000/api/users', {
           headers: {
             Authorization: `Bearer ${token.trim()}`
@@ -260,7 +326,7 @@ export default {
 
       editItem (item) {
         this.editedIndex = this.desserts.indexOf(item)
-        this.editedItem = Object.assign({}, item)
+        this.editedItem = Object.assign({newAvatar: null}, item)
         this.dialog = true
       },
 
@@ -292,16 +358,39 @@ export default {
       },
 
       save () {
-        if (this.editedIndex > -1) {
-          Object.assign(this.desserts[this.editedIndex], this.editedItem)
-        } else {
-          this.desserts.push(this.editedItem)
-        }
-        this.close()
+        const formData = new FormData();
+        formData.append("name", this.editedItem.name)
+        formData.append("email", this.editedItem.email)
+        formData.append("zipcode", this.editedItem.address.zipcode)
+        formData.append("public_area", this.editedItem.address.public_area)
+        formData.append("neighborhood", this.editedItem.address.neighborhood)
+        formData.append("locality", this.editedItem.address.locality)
+        formData.append("uf", this.editedItem.address.uf)
+
+        let headers = {};
+          if (this.editedItem.newAvatar) {
+            const token = this.$store.getters.getUserToken || localStorage.getItem('accessToken');
+
+            formData.append("avatar", this.editedItem.newAvatar)
+            headers = {
+              'Content-Type': 'multipart/form-data',
+              'Authorization': `Bearer ${token}`
+            };
+          }
+        
+        axios
+          .post(`http://localhost:8000/api/users/${this.editedItem.id}?_method=PUT`, formData, { headers })
+          .then(response => {
+            if ('error' in response)
+              throw new Error(response.message)
+            
+            this.initialize()
+            this.close()
+          });
       },
 
       doLogout () {
-        const token = localStorage.getItem('accessToken');
+        const token = this.$store.getters.getUserToken || localStorage.getItem('accessToken');
         axios.delete('http://localhost:8000/api/auth', {
           headers: {
             Authorization: `Bearer ${token}`
@@ -321,9 +410,14 @@ export default {
 
       logout() {
         this.$router.push({name: 'auth-user'})
+        
         localStorage.removeItem('accessToken')
+        localStorage.removeItem('userData')
+
         this.$store.dispatch('SET_ACCESS_TOKEN', null);
-      }
+        this.$store.dispatch('SET_USER_DATA', null)
+
+      },
     },
   }
 </script>
