@@ -87,10 +87,10 @@ import axios from 'axios'
 
             const { data } = response;
             localStorage.setItem('accessToken', data?.authorization?.token)
-            this.$store.dispatch('SET_USER_DATA', {
-              user: data.user,
-              token: data?.authorization?.token
-            })
+            localStorage.setItem('userData', data?.user)
+
+            this.$store.dispatch('SET_USER_DATA', data.user)
+            this.$store.dispatch('SET_ACCESS_TOKEN', data?.authorization?.token)
 
             this.$router.push({name: 'home'});
           })
