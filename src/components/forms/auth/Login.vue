@@ -81,7 +81,7 @@
             throw new Error('Por favor verifique os campos requeridos e tente novamente.');
           }
 
-          const apiUrl = 'http://localhost:8000/api';
+          const apiUrl = process.env.API_URL;
           axios.post(`${apiUrl}/auth`, {
             email: this.email,
             password: this.password

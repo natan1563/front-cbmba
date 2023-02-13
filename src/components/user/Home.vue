@@ -46,8 +46,8 @@
                       size="48"
                     >
                       <v-img
-                        :lazy-src="`http://localhost:8000/api/avatar/${editedItem.avatar}`"
-                        :src="`http://localhost:8000/api/avatar/${editedItem.avatar}`"
+                        :lazy-src="`${API_URL}/avatar/${editedItem.avatar}`"
+                        :src="`${API_URL}/avatar/${editedItem.avatar}`"
                       />
                     </v-avatar>
 
@@ -389,6 +389,7 @@ export default {
       fileRules: [
         value => !value || value.size < 2000000 || 'O tamanho da imagem tem que ser menor que 2 MB!',
       ],
+      API_URL: process.env.API_URL,
     }),
 
     watch: {
@@ -418,7 +419,7 @@ export default {
       initialize () {
         this.desserts = [];
         const token = this.getToken();
-        axios.get('http://localhost:8000/api/users', {
+        axios.get(`${this.API_URL}/users`, {
           headers: {
             Authorization: `Bearer ${token.trim()}`
           }
@@ -449,7 +450,7 @@ export default {
 
       async deleteItemConfirm () {
         const token = this.getToken();
-        const apiUrl = `http://localhost:8000/api/users/${this.editedItem.id}?_method=DELETE`;
+        const apiUrl = `${this.API_URL}/users/${this.editedItem.id}?_method=DELETE`;
         try {
           await axios.post(apiUrl, [], {
             headers: {
@@ -511,7 +512,7 @@ export default {
           }
           
           axios
-            .post(`http://localhost:8000/api/users/${this.editedItem.id}?_method=PUT`, formData, { headers })
+            .post(`${this.API_URL}/users/${this.editedItem.id}?_method=PUT`, formData, { headers })
             .then(response => {
               if ('error' in response)
                 throw new Error(response.message)
@@ -531,7 +532,7 @@ export default {
 
       doLogout () {
         const token = this.getToken();
-        axios.delete('http://localhost:8000/api/auth', {
+        axios.delete(`${this.API_URL}/auth`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
