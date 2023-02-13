@@ -247,7 +247,7 @@
             </form>
           </validation-observer>
         </v-dialog>
-        <v-dialog v-model="dialogDelete" max-width="550px">
+        <v-dialog v-model="dialogDelete" max-width="550px" class="p-5">
           <v-card>
               <v-card-title class="text-h5">Tem certeza que deseja excluir esse usuário?</v-card-title>
               <v-card-actions>
