@@ -235,13 +235,13 @@
             </form>
           </validation-observer>
         </v-dialog>
-        <v-dialog v-model="dialogDelete" max-width="500px">
+        <v-dialog v-model="dialogDelete" max-width="550px">
           <v-card>
             <v-card-title class="text-h5">Tem certeza que deseja excluir esse usuário?</v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
               <v-btn color="blue darken-1" text @click="closeDelete">Cancel</v-btn>
-              <v-btn color="blue darken-1" text @click="deleteItemConfirm">OK</v-btn>
+              <v-btn color="red" class="white--text" @click="deleteItemConfirm">OK</v-btn>
               <v-spacer></v-spacer>
             </v-card-actions>
           </v-card>
@@ -403,7 +403,7 @@ export default {
     async created () {
       await this.isLogged()
       this.initialize()
-       this.brazilianUFs = brazilianData.UF.map(item => {
+      this.brazilianUFs = brazilianData.UF.map(item => {
         return item.sigla
       });
     },
@@ -416,7 +416,8 @@ export default {
 
     methods: {
       initialize () {
-        const token = this.$store.getters.getUserToken || localStorage.getItem('accessToken');
+        this.desserts = [];
+        const token = this.getToken();
         axios.get('http://localhost:8000/api/users', {
           headers: {
             Authorization: `Bearer ${token.trim()}`
@@ -434,7 +435,7 @@ export default {
         });
       },
 
-      editItem (item) {
+      asynceditItem (item) {
         this.editedIndex = this.desserts.indexOf(item)
         this.editedItem = Object.assign({newAvatar: null}, item)
         this.dialog = true
@@ -446,9 +447,22 @@ export default {
         this.dialogDelete = true
       },
 
-      deleteItemConfirm () {
-        this.desserts.splice(this.editedIndex, 1)
-        this.closeDelete()
+      async deleteItemConfirm () {
+        const token = this.getToken();
+        const apiUrl = `http://localhost:8000/api/users/${this.editedItem.id}?_method=DELETE`;
+        try {
+          await axios.post(apiUrl, [], {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          
+          this.initialize()
+          this.closeDelete()
+        } catch (error) {
+          let errorMessage = 'Falha ao deletar o usuário';
+          this.$root.$emit('active-snackbar', errorMessage)
+        }
       },
 
       close () {
@@ -484,19 +498,16 @@ export default {
           formData.append("locality", this.editedItem.address.locality)
           formData.append("uf", this.editedItem.address.uf)
 
-          const token = this.$store.getters.getUserToken || localStorage.getItem('accessToken');
+          const token = this.getToken();
           let headers = {
             'Authorization': `Bearer ${token}`
           };
 
           if (this.editedItem.newAvatar) {
-
             formData.append("avatar", this.editedItem.newAvatar)
             headers = Object.assign(headers, {
               'Content-Type': 'multipart/form-data',
             });
-
-            console.log(headers);
           }
           
           axios
@@ -514,8 +525,12 @@ export default {
         })
       },
 
+      getToken() {
+        return this.$store.getters.getUserToken || localStorage.getItem('accessToken');
+      },
+
       doLogout () {
-        const token = this.$store.getters.getUserToken || localStorage.getItem('accessToken');
+        const token = this.getToken();
         axios.delete('http://localhost:8000/api/auth', {
           headers: {
             Authorization: `Bearer ${token}`
