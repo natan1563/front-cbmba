@@ -435,7 +435,7 @@ export default {
         });
       },
 
-      asynceditItem (item) {
+      editItem (item) {
         this.editedIndex = this.desserts.indexOf(item)
         this.editedItem = Object.assign({newAvatar: null}, item)
         this.dialog = true
