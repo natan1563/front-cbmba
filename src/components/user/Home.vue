@@ -269,7 +269,12 @@
       </v-icon>
     </template>
     <template v-slot:no-data>
-     <v-progress-circular indeterminate></v-progress-circular>
+     <span v-if="dataIsLoading">
+      <v-progress-circular indeterminate></v-progress-circular>
+     </span>
+     <span v-else>
+      Nenhum resultado encontrado.
+     </span>
     </template>
   </v-data-table>
   <ErrorSnackbar />
@@ -390,6 +395,7 @@ export default {
         value => !value || value.size < 2000000 || 'O tamanho da imagem tem que ser menor que 2 MB!',
       ],
       API_URL: process.env.API_URL,
+      dataIsLoading: true
     }),
 
     watch: {
@@ -418,6 +424,7 @@ export default {
     methods: {
       initialize () {
         this.desserts = [];
+        this.dataIsLoading = true;
         const token = this.getToken();
         axios.get(`${this.API_URL}/users`, {
           headers: {
@@ -433,6 +440,9 @@ export default {
         })
         .catch(error => {
           this.setError(error);
+        })
+        .finally(() => {
+          this.dataIsLoading = false;
         });
       },
 
