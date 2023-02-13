@@ -37,13 +37,17 @@
       </v-btn>
 
     </form>
+  <ErrorSnackbar />
   </validation-observer>
+
 </template>
 
 <script>
   import { required, email } from 'vee-validate/dist/rules'
   import { extend, ValidationObserver, ValidationProvider, setInteractionMode } from 'vee-validate'
-import axios from 'axios'
+  import axios from 'axios'
+  import ErrorSnackbar from '@/components/ErrorSnackbar';
+
   // import axios from 'axios';
 
   setInteractionMode('eager')
@@ -61,6 +65,7 @@ import axios from 'axios'
     components: {
       ValidationProvider,
       ValidationObserver,
+      ErrorSnackbar
     },
     data: () => ({
       email: '',
@@ -95,8 +100,11 @@ import axios from 'axios'
             this.$router.push({name: 'home'});
           })
           .catch(error => {
-            // TODO: Implementar mensagem amigavel de erro
-            console.log(error.message)
+            let errorMessage = 'Ocorreu um erro, por favor tente novamente.';
+            if (error.response.status === 401)
+              errorMessage = 'Email ou senha inválidos.';
+
+            this.$root.$emit('active-snackbar', errorMessage)
           })
         })
       },

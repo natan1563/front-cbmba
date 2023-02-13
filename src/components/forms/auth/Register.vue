@@ -144,14 +144,16 @@
       >
         Cadastrar
       </v-btn>
-
     </form>
+    <ErrorSnackbar />
   </validation-observer>
 </template>
 
 <script>
   import { required, digits, email, min, max, confirmed } from 'vee-validate/dist/rules'
   import { extend, ValidationObserver, ValidationProvider, setInteractionMode } from 'vee-validate'
+
+  import ErrorSnackbar from '@/components/ErrorSnackbar';
   import brazilianData from '@/assets/json/br-states-uf.json';
   import axios from 'axios';
 
@@ -191,6 +193,7 @@
     components: {
       ValidationProvider,
       ValidationObserver,
+      ErrorSnackbar
     },
     data: () => ({
       name: '',

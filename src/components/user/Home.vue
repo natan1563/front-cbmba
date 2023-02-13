@@ -237,7 +237,7 @@
         </v-dialog>
         <v-dialog v-model="dialogDelete" max-width="500px">
           <v-card>
-            <v-card-title class="text-h5">Are you sure you want to delete this item?</v-card-title>
+            <v-card-title class="text-h5">Tem certeza que deseja excluir esse usuário?</v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
               <v-btn color="blue darken-1" text @click="closeDelete">Cancel</v-btn>
@@ -272,6 +272,7 @@
      <v-progress-circular indeterminate></v-progress-circular>
     </template>
   </v-data-table>
+  <ErrorSnackbar />
 </v-container>
 </template>
 
@@ -282,6 +283,7 @@ import brazilianData from '@/assets/json/br-states-uf.json';
 
 import { required, digits, email, min, max, confirmed } from 'vee-validate/dist/rules'
 import { extend, ValidationObserver, ValidationProvider, setInteractionMode } from 'vee-validate'
+import ErrorSnackbar from '../ErrorSnackbar';
 
 setInteractionMode('eager')
 extend('digits', {
@@ -289,35 +291,36 @@ extend('digits', {
     message: '{_field_} precisa ter no mínimo {length} digits. ({_value_})',
   })
 
-  extend('confirmed', {
-    ...confirmed,
-    message: '{_field_} precisa ser idêntico ao campo de confirmação de senha.',
-  })
+extend('confirmed', {
+  ...confirmed,
+  message: '{_field_} precisa ser idêntico ao campo de confirmação de senha.',
+})
 
-  extend('required', {
-    ...required,
-    message: '{_field_} não pode estar vazio.',
-  })
+extend('required', {
+  ...required,
+  message: '{_field_} não pode estar vazio.',
+})
 
-  extend('max', {
-    ...max,
-    message: '{_field_} não pode ter mais de {length} caracteres.',
-  })
+extend('max', {
+  ...max,
+  message: '{_field_} não pode ter mais de {length} caracteres.',
+})
 
-  extend('min', {
-    ...min,
-    message: '{_field_} não pode ter menos de {length} caracteres',
-  })
+extend('min', {
+  ...min,
+  message: '{_field_} não pode ter menos de {length} caracteres',
+})
 
-  extend('email', {
-    ...email,
-    message: 'Email must be valid',
-  })
+extend('email', {
+  ...email,
+  message: 'Email must be valid',
+})
 
 export default {
   components: {
     ValidationObserver,
-    ValidationProvider
+    ValidationProvider,
+    ErrorSnackbar
   },
     mixins: [LoggedMixin],
     data: () => ({
@@ -425,6 +428,9 @@ export default {
           }
           const users = response.data.data
           this.desserts = users;
+        })
+        .catch(error => {
+          this.$root.$emit('active-snackbar', error.message)
         });
       },
 
@@ -464,7 +470,7 @@ export default {
       save () {
         this.$refs.observer
         .validate()
-        .then((isValid) =>{
+        .then((isValid) => {
           if (!isValid) {
             throw new Error('Por favor verifique os campos requeridos e tente novamente.');
           }
@@ -503,6 +509,9 @@ export default {
               this.close()
             });
         })
+        .catch(error => {
+          this.$root.$emit('active-snackbar', error.message)
+        })
       },
 
       doLogout () {
@@ -516,8 +525,8 @@ export default {
           if ('error' in response)
             throw new Error(response.error)
         })
-        .catch(err => {
-          console.log(err)
+        .catch(error => {
+          this.$root.$emit('active-snackbar', error.message)
         })
         .finally(() => {
           this.logout();
