@@ -268,7 +268,7 @@
               }
 
               localStorage.setItem('accessToken', data?.token)
-              localStorage.setItem('userData', data?.user)
+              localStorage.setItem('userData', JSON.stringify(data?.user))
 
               this.$store.dispatch('SET_USER_DATA', data.user)
               this.$store.dispatch('SET_ACCESS_TOKEN', data.token)

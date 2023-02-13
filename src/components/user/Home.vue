@@ -34,141 +34,206 @@
           max-width="800px"
           max-height="600px"
         >
-          <v-card>
-            <v-card-title>
-              <div class="px-2">
-                <v-avatar
-                  v-if="editedItem.avatar"
-                  size="48"
-                >
-                  <v-img
-                    :lazy-src="`http://localhost:8000/api/avatar/${editedItem.avatar}`"
-                    :src="`http://localhost:8000/api/avatar/${editedItem.avatar}`"
-                  />
-                </v-avatar>
+          <validation-observer
+            ref="observer"
+          >
+            <form @submit.prevent="save">
+              <v-card>
+                <v-card-title>
+                  <div class="px-2">
+                    <v-avatar
+                      v-if="editedItem.avatar"
+                      size="48"
+                    >
+                      <v-img
+                        :lazy-src="`http://localhost:8000/api/avatar/${editedItem.avatar}`"
+                        :src="`http://localhost:8000/api/avatar/${editedItem.avatar}`"
+                      />
+                    </v-avatar>
 
-              </div>
-              <span class="text-h5">{{ editedItem.name }}</span>
-            </v-card-title>
+                  </div>
+                  <span class="text-h5">{{ editedItem.name }}</span>
+                </v-card-title>
 
-            <v-card-text>
-              <v-container>
-                <v-row>
-                  <v-col
-                    cols="12"
-                    sm="6"
-                    md="4"
-                  >
-                    <v-text-field
-                      v-model="editedItem.name"
-                      label="Nome completo"
-                    ></v-text-field>
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    sm="6"
-                    md="4"
-                  >
-                    <v-text-field
-                      v-model="editedItem.email"
-                      label="E-mail"
-                    ></v-text-field>
-                  </v-col>
+                <v-card-text>
+                  <v-container>
+                    <v-row>
+                      <v-col
+                        cols="12"
+                        sm="6"
+                        md="4"
+                      >
+                        <validation-provider
+                          v-slot="{ errors }"
+                          name="Name"
+                          rules="required|max:30"
+                        >
+                          <v-text-field
+                            v-model="editedItem.name"
+                            :counter="30"
+                            label="Nome completo"
+                            :error-messages="errors"
+                            required
+                          ></v-text-field>
+                        </validation-provider>
+                      </v-col>
+                      <v-col
+                        cols="12"
+                        sm="6"
+                        md="4"
+                      >
+                        <validation-provider
+                          v-slot="{ errors }"
+                          name="E-mail"
+                          rules="required|email"
+                        >
+                          <v-text-field
+                            v-model="editedItem.email"
+                            :error-messages="errors"
+                            label="E-mail"
+                            required
+                          ></v-text-field>
+                        </validation-provider>
+                      </v-col>
 
-                  <v-col
-                    cols="12"
-                    sm="6"
-                    md="4"
-                  >
-                    <v-text-field
-                      v-model="editedItem.address.zipcode"
-                      label="CEP"
-                    ></v-text-field>
-                  </v-col>
+                      <v-col
+                        cols="12"
+                        sm="6"
+                        md="4"
+                      >
+                        <validation-provider
+                          v-slot="{ errors }"
+                          name="CEP"
+                          rules="required|max:9"
+                        >
+                          <v-text-field
+                            v-model="editedItem.address.zipcode"
+                            :error-messages="errors"
+                            :counter="9"
+                            label="CEP"
+                            required
+                          ></v-text-field>
+                        </validation-provider>
+                      </v-col>
 
-                  <v-col
-                    cols="12"
-                    sm="6"
-                    md="4"
-                  >
-                    <v-text-field
-                      v-model="editedItem.address.public_area"
-                      label="Endereço"
-                    ></v-text-field>
-                  </v-col>
+                      <v-col
+                        cols="12"
+                        sm="6"
+                        md="4"
+                      >
+                        <validation-provider
+                          v-slot="{ errors }"
+                          name="Logradouro"
+                          rules="required"
+                        >
+                          <v-text-field
+                            v-model="editedItem.address.public_area"
+                            :error-messages="errors"
+                            label="Logradouro"
+                            required
+                          ></v-text-field>
+                        </validation-provider>
+                      </v-col>
 
-                  <v-col
-                    cols="12"
-                    sm="6"
-                    md="4"
-                  >
-                    <v-text-field
-                      v-model="editedItem.address.public_area"
-                      label="Município"
-                    ></v-text-field>
-                  </v-col>
+                      <v-col
+                        cols="12"
+                        sm="6"
+                        md="4"
+                      >
+                        <validation-provider
+                          v-slot="{ errors }"
+                          name="Município"
+                          rules="required|max:30"
+                        >
+                          <v-text-field
+                            v-model="editedItem.address.locality"
+                            :counter="30"
+                            :error-messages="errors"
+                            label="Município"
+                            required
+                          ></v-text-field>
+                        </validation-provider>
 
-                  <v-col
-                    cols="12"
-                    sm="6"
-                    md="4"
-                  >
-                    <v-text-field
-                      v-model="editedItem.address.neighborhood"
-                      label="Bairro"
-                    ></v-text-field>
-                  </v-col>
+                      </v-col>
 
-                  <v-col
-                    cols="12"
-                    sm="6"
-                    md="4"
-                  >
-                    <v-select
-                    v-model="editedItem.address.uf"
-                    :items="brazilianUFs"
-                    label="UF"
-                    data-vv-name="UF"
-                    required
-                  ></v-select>
-                  </v-col>
-                  
-                  <v-col
-                    cols="12"
-                    sm="6"
-                    md="4"
-                  >
-                    <v-file-input
-                      v-model="editedItem.newAvatar"
-                      :rules="fileRules"
-                      accept="image/png, image/jpeg, image/bmp"
-                      placeholder="Escolha um avatar"
-                      prepend-icon="mdi-camera"
-                      label="Avatar"
-                    ></v-file-input>
-                  </v-col>
-                </v-row>
-              </v-container>
-            </v-card-text>
+                      <v-col
+                        cols="12"
+                        sm="6"
+                        md="4"
+                      >
+                        <validation-provider
+                          v-slot="{ errors }"
+                          name="Bairro"
+                          rules="required"
+                        >
+                          <v-text-field
+                            v-model="editedItem.address.neighborhood"
+                            :error-messages="errors"
+                            label="Bairro"
+                            required
+                          ></v-text-field>
+                        </validation-provider>
+                      </v-col>
 
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn
-                color="blue darken-1"
-                text
-                @click="close"
-              >
-                Cancelar
-              </v-btn>
-              <v-btn
-                color="blue darken-1"
-                text
-                @click="save"
-              >
-                Atualizar
-              </v-btn>
-            </v-card-actions>
-          </v-card>
+                      <v-col
+                        cols="12"
+                        sm="6"
+                        md="4"
+                      >
+                        <validation-provider
+                          v-slot="{ errors }"
+                          name="UF"
+                          rules="required|max:2"
+                        >
+                          <v-select
+                            v-model="editedItem.address.uf"
+                            :items="brazilianUFs"
+                            :error-messages="errors"
+                            label="UF"
+                            data-vv-name="UF"
+                            required
+                          ></v-select>
+                        </validation-provider>
+                      </v-col>
+                      
+                      <v-col
+                        cols="12"
+                        sm="6"
+                        md="4"
+                      >
+                        <v-file-input
+                          v-model="editedItem.newAvatar"
+                          :rules="fileRules"
+                          accept="image/png, image/jpeg, image/bmp"
+                          placeholder="Escolha um avatar"
+                          prepend-icon="mdi-camera"
+                          label="Avatar"
+                        ></v-file-input>
+                      </v-col>
+                    </v-row>
+                  </v-container>
+                </v-card-text>
+
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn
+                    color="blue darken-1"
+                    text
+                    @click.prevent="close"
+                  >
+                    Cancelar
+                  </v-btn>
+                  <v-btn
+                    color="blue darken-1"
+                    text
+                    type="submit"
+                  >
+                    Atualizar
+                  </v-btn>
+                </v-card-actions>
+              </v-card>
+            </form>
+          </validation-observer>
         </v-dialog>
         <v-dialog v-model="dialogDelete" max-width="500px">
           <v-card>
@@ -215,7 +280,45 @@ import axios from 'axios'
 import LoggedMixin from '@/mixins/LoggedMixin';
 import brazilianData from '@/assets/json/br-states-uf.json';
 
+import { required, digits, email, min, max, confirmed } from 'vee-validate/dist/rules'
+import { extend, ValidationObserver, ValidationProvider, setInteractionMode } from 'vee-validate'
+
+setInteractionMode('eager')
+extend('digits', {
+    ...digits,
+    message: '{_field_} precisa ter no mínimo {length} digits. ({_value_})',
+  })
+
+  extend('confirmed', {
+    ...confirmed,
+    message: '{_field_} precisa ser idêntico ao campo de confirmação de senha.',
+  })
+
+  extend('required', {
+    ...required,
+    message: '{_field_} não pode estar vazio.',
+  })
+
+  extend('max', {
+    ...max,
+    message: '{_field_} não pode ter mais de {length} caracteres.',
+  })
+
+  extend('min', {
+    ...min,
+    message: '{_field_} não pode ter menos de {length} caracteres',
+  })
+
+  extend('email', {
+    ...email,
+    message: 'Email must be valid',
+  })
+
 export default {
+  components: {
+    ValidationObserver,
+    ValidationProvider
+  },
     mixins: [LoggedMixin],
     data: () => ({
       dialog: false,
@@ -262,10 +365,11 @@ export default {
       editedIndex: -1,
       editedItem: {
         name: '',
-        email: 0,
-        address: 0,
+        email: '',
+        address: [],
         avatar: '',
-        neighborhood: 0,
+        neighborhood: '',
+        locality: '',
         uf: 0,
         created_at: 0,
         newAvatar: ''
@@ -358,35 +462,47 @@ export default {
       },
 
       save () {
-        const formData = new FormData();
-        formData.append("name", this.editedItem.name)
-        formData.append("email", this.editedItem.email)
-        formData.append("zipcode", this.editedItem.address.zipcode)
-        formData.append("public_area", this.editedItem.address.public_area)
-        formData.append("neighborhood", this.editedItem.address.neighborhood)
-        formData.append("locality", this.editedItem.address.locality)
-        formData.append("uf", this.editedItem.address.uf)
+        this.$refs.observer
+        .validate()
+        .then((isValid) =>{
+          if (!isValid) {
+            throw new Error('Por favor verifique os campos requeridos e tente novamente.');
+          }
 
-        let headers = {};
+          const formData = new FormData();
+          formData.append("name", this.editedItem.name)
+          formData.append("email", this.editedItem.email)
+          formData.append("zipcode", this.editedItem.address.zipcode)
+          formData.append("public_area", this.editedItem.address.public_area)
+          formData.append("neighborhood", this.editedItem.address.neighborhood)
+          formData.append("locality", this.editedItem.address.locality)
+          formData.append("uf", this.editedItem.address.uf)
+
+          const token = this.$store.getters.getUserToken || localStorage.getItem('accessToken');
+          let headers = {
+            'Authorization': `Bearer ${token}`
+          };
+
           if (this.editedItem.newAvatar) {
-            const token = this.$store.getters.getUserToken || localStorage.getItem('accessToken');
 
             formData.append("avatar", this.editedItem.newAvatar)
-            headers = {
+            headers = Object.assign(headers, {
               'Content-Type': 'multipart/form-data',
-              'Authorization': `Bearer ${token}`
-            };
+            });
+
+            console.log(headers);
           }
-        
-        axios
-          .post(`http://localhost:8000/api/users/${this.editedItem.id}?_method=PUT`, formData, { headers })
-          .then(response => {
-            if ('error' in response)
-              throw new Error(response.message)
-            
-            this.initialize()
-            this.close()
-          });
+          
+          axios
+            .post(`http://localhost:8000/api/users/${this.editedItem.id}?_method=PUT`, formData, { headers })
+            .then(response => {
+              if ('error' in response)
+                throw new Error(response.message)
+              
+              this.initialize()
+              this.close()
+            });
+        })
       },
 
       doLogout () {
