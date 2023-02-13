@@ -142,7 +142,12 @@
         class="mr-4"
         type="submit"
       >
-        Cadastrar
+        <span v-if="!onRequest">Cadastrar</span>
+        <v-progress-circular
+          v-else
+          indeterminate 
+          :size="15"
+        />
       </v-btn>
     </form>
     <ErrorSnackbar />
@@ -210,6 +215,7 @@
       fileRules: [
         value => !value || value.size < 2000000 || 'O tamanho da imagem tem que ser menor que 2 MB!',
       ],
+      onRequest: false,
     }),
 
     created() {
@@ -238,6 +244,7 @@
     },
     methods: {
       submit () {
+        this.onRequest = true;
         this.$refs.observer
         .validate()
         .then((isValid) =>{
@@ -280,7 +287,13 @@
             })
             .catch(error => {
               this.setError(error)
+            })
+            .finally(() => {
+              this.onRequest = false;
             });
+        })
+        .catch(() => {
+          this.onRequest = false;
         })
       },
       setError(error) {

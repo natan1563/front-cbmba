@@ -29,11 +29,17 @@
           required
         ></v-text-field>
       </validation-provider>
+      
       <v-btn
         class="mr-4"
         type="submit"
       >
-        Entrar
+        <span v-if="!onRequest">Entrar</span>
+        <v-progress-circular
+          v-else
+          indeterminate 
+          :size="15"
+        />
       </v-btn>
 
     </form>
@@ -70,13 +76,15 @@
     data: () => ({
       email: '',
       password: '',
+      onRequest: false
     }),
 
     methods: {
       submit () {
+        this.onRequest = true;
         this.$refs.observer
         .validate()
-        .then((isValid) =>{
+        .then((isValid) => {
           if (!isValid) {
             throw new Error('Por favor verifique os campos requeridos e tente novamente.');
           }
@@ -100,12 +108,16 @@
             this.$router.push({name: 'home'});
           })
           .catch(error => {
+            this.onRequest = false;
             let errorMessage = 'Ocorreu um erro, por favor tente novamente.';
             if (error?.response?.status === 401)
               errorMessage = 'Email ou senha inválidos.';
 
             this.$root.$emit('active-snackbar', errorMessage)
           })
+        })
+        .catch(() => {
+          this.onRequest = false;
         })
       },
     }

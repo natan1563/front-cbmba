@@ -215,6 +215,12 @@
                 </v-card-text>
 
                 <v-card-actions>
+                    <v-progress-circular
+                      v-if="editedItem.onRequest"
+                      class="ml-3"
+                      indeterminate
+                      :size="15"
+                    />
                   <v-spacer></v-spacer>
                   <v-btn
                     color="blue darken-1"
@@ -448,7 +454,12 @@ export default {
 
       editItem (item) {
         this.editedIndex = this.desserts.indexOf(item)
-        this.editedItem = Object.assign({newAvatar: null}, item)
+        this.editedItem = Object.assign({
+            newAvatar: null,
+            onRequest: false
+          }, 
+          item
+        )
         this.dialog = true
       },
 
@@ -493,6 +504,7 @@ export default {
       },
 
       save () {
+        this.editedItem.onRequest = true;
         this.$refs.observer
         .validate()
         .then((isValid) => {
@@ -532,9 +544,13 @@ export default {
             })
             .catch(error => {
               this.setError(error);
+            })
+            .finally(() => {
+              this.editedItem.onRequest = false;
             });
         })
         .catch(error => {
+          this.editedItem.onRequest = false;
           this.setError(error);
         })
       },
