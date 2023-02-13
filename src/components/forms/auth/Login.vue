@@ -101,7 +101,7 @@
           })
           .catch(error => {
             let errorMessage = 'Ocorreu um erro, por favor tente novamente.';
-            if (error.response.status === 401)
+            if (error?.response?.status === 401)
               errorMessage = 'Email ou senha inválidos.';
 
             this.$root.$emit('active-snackbar', errorMessage)

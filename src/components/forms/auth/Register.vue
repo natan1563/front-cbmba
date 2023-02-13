@@ -237,7 +237,7 @@
       }
     },
     methods: {
-      async submit () {
+      submit () {
         this.$refs.observer
         .validate()
         .then((isValid) =>{
@@ -277,9 +277,17 @@
               this.$store.dispatch('SET_ACCESS_TOKEN', data.token)
 
               this.$router.push({name: 'home'})
+            })
+            .catch(error => {
+              this.setError(error)
             });
         })
       },
+      setError(error) {
+        const defaultError = 'Ocorreu um erro inesperado, por favor tente novamente.';
+        const errorMessage = error?.response?.data?.error || error?.message || defaultError
+        this.$root.$emit('active-snackbar', errorMessage)
+      }
     },
   }
 </script>

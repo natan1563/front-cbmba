@@ -432,7 +432,7 @@ export default {
           this.desserts = users;
         })
         .catch(error => {
-          this.$root.$emit('active-snackbar', error.message)
+          this.setError(error);
         });
       },
 
@@ -510,7 +510,7 @@ export default {
               'Content-Type': 'multipart/form-data',
             });
           }
-          
+
           axios
             .post(`${this.API_URL}/users/${this.editedItem.id}?_method=PUT`, formData, { headers })
             .then(response => {
@@ -519,10 +519,13 @@ export default {
               
               this.initialize()
               this.close()
+            })
+            .catch(error => {
+              this.setError(error);
             });
         })
         .catch(error => {
-          this.$root.$emit('active-snackbar', error.message)
+          this.setError(error);
         })
       },
 
@@ -542,7 +545,7 @@ export default {
             throw new Error(response.error)
         })
         .catch(error => {
-          this.$root.$emit('active-snackbar', error.message)
+          this.setError(error)
         })
         .finally(() => {
           this.logout();
@@ -559,6 +562,12 @@ export default {
         this.$store.dispatch('SET_USER_DATA', null)
 
       },
+
+      setError(error) {
+        const defaultError = 'Ocorreu um erro inesperado, por favor tente novamente.';
+        const errorMessage = error?.response?.data?.error || error?.message || defaultError
+        this.$root.$emit('active-snackbar', errorMessage)
+      }
     },
   }
 </script>
